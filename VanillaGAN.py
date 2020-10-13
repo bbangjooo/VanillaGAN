@@ -107,9 +107,7 @@ def train(epoch):
         D_real_loss=criterion(real_output,real_correct)
 
         # 가짜 이미지를 가짜로 판별할 수 있게 학습
-        z=Variable(torch.randn((batch_size, 100))).to(device)
-        fake_image=Gen(z)
-        fake_output=Discrim(fake_image)
+        fake_output=Discrim(gen_img)
         D_optimizer.zero_grad()
         D_fake_loss=criterion(fake_output,fake_correct)
         D_loss=(D_real_loss+D_fake_loss)/2
