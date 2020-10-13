@@ -89,7 +89,7 @@ D_optimizer=optim.Adam(Discrim.parameters(),lr=leraing_rate, betas=(0.5, 0.999))
 # Train
 def train(epoch):
     for batch_idx,(data,_) in enumerate(train_loader):
-            with torch.autograd.set_detect_anomaly(True):
+        with torch.autograd.set_detect_anomaly(True):
             batch_size=data.size(0)
             fake_correct=Variable(torch.zeros(batch_size,1)).to(device)
             real_correct=Variable(torch.ones(batch_size,1)).to(device)
