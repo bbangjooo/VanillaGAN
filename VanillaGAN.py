@@ -46,10 +46,10 @@ class Generator(nn.Module):
             layers.append(nn.ReLU())
             return layers
         self.generator=nn.Sequential(
-            *block(100,128),
-            *block(128,256),
-            *block(256,512),
-            *block(512,1024),
+            *gen_block(100,128),
+            *gen_block(128,256),
+            *gen_block(256,512),
+            *gen_block(512,1024),
             nn.Linear(1024,784),
             nn.Tanh()
         )
