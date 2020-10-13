@@ -92,7 +92,7 @@ def train(epoch):
         batch_size=data.size(0)
         fake_correct=Variable(torch.zeros(batch_size,1)).to(device)
         real_correct=Variable(torch.ones(batch_size,1)).to(device)
-        z=Variable(torch.randn((batch_size, 100))).to(device)
+        z=Variable(torch.randn(batch_size, 100)).to(device)
         data=Variable(data).to(device)
 
         # Gen 학습
