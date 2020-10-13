@@ -89,37 +89,38 @@ D_optimizer=optim.Adam(Discrim.parameters(),lr=leraing_rate, betas=(0.5, 0.999))
 # Train
 def train(epoch):
     for batch_idx,(data,_) in enumerate(train_loader):
-        batch_size=data.size(0)
-        fake_correct=Variable(torch.zeros(batch_size,1)).to(device)
-        real_correct=Variable(torch.ones(batch_size,1)).to(device)
-        z=torch.randn(batch_size, 100,device=device)
-        data=Variable(data).to(device)
+            with torch.autograd.set_detect_anomaly(True):
+            batch_size=data.size(0)
+            fake_correct=Variable(torch.zeros(batch_size,1)).to(device)
+            real_correct=Variable(torch.ones(batch_size,1)).to(device)
+            z=torch.randn(batch_size, 100,device=device)
+            data=Variable(data).to(device)
 
-        # Gen 학습
-        gen_img=Gen(z)
-        G_optimizer.zero_grad()
-        G_loss=criterion(Discrim(gen_img),real_correct)
-        G_loss.backward(retain_graph=True)
-        G_optimizer.step()
-        # Discrim 학습
-        # 진짜 이미지를 진짜로 판별할 수 있게 학습
-        real_output=Discrim(data)
-        D_real_loss=criterion(real_output,real_correct)
+            # Gen 학습
+            gen_img=Gen(z)
+            G_optimizer.zero_grad()
+            G_loss=criterion(Discrim(gen_img),real_correct)
+            G_loss.backward(retain_graph=True)
+            G_optimizer.step()
+            # Discrim 학습
+            # 진짜 이미지를 진짜로 판별할 수 있게 학습
+            real_output=Discrim(data)
+            D_real_loss=criterion(real_output,real_correct)
 
-        # 가짜 이미지를 가짜로 판별할 수 있게 학습
-        gen_img.detach().to(device) # Gen은 이미 학습해서 다시 학습 안 시키게 detach()
-        fake_output=Discrim(gen_img)
-        D_optimizer.zero_grad()
-        D_fake_loss=criterion(fake_output,fake_correct)
-        D_loss=(D_real_loss+D_fake_loss)/2
-        D_loss.backward()
-        D_optimizer.step()
+            # 가짜 이미지를 가짜로 판별할 수 있게 학습
+            gen_img.detach().to(device) # Gen은 이미 학습해서 다시 학습 안 시키게 detach()
+            fake_output=Discrim(gen_img)
+            D_optimizer.zero_grad()
+            D_fake_loss=criterion(fake_output,fake_correct)
+            D_loss=(D_real_loss+D_fake_loss)/2
+            D_loss.backward()
+            D_optimizer.step()
 
-        batch_finish=epoch * len(train_loader) + batch_idx
-        if (batch_finish) % 400 == 0:
-            print("[Epoch %d/%d] [D loss: %f] [G loss: %f]"
-            % (epoch, 200, D_loss.item(), G_loss.item())
-            )
+            batch_finish=epoch * len(train_loader) + batch_idx
+            if (batch_finish) % 400 == 0:
+                print("[Epoch %d/%d] [D loss: %f] [G loss: %f]"
+                % (epoch, 200, D_loss.item(), G_loss.item())
+                )
     if (epoch+1) % 10 == 0:
         gen_img = gen_img.reshape([batch_size, 1, 28, 28])
         img_grid = make_grid(gen_img, nrow=10, normalize=True)
