@@ -112,7 +112,7 @@ def train(epoch):
         D_optimizer.zero_grad()
         D_fake_loss=criterion(fake_output,fake_correct)
         D_loss=(D_real_loss+D_fake_loss)/2
-        D_loss.backward()
+        D_loss.backward(retain_graph=True)
         D_optimizer.step()
 
         batch_finish=epoch * len(train_loader) + batch_idx
