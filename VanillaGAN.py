@@ -41,44 +41,44 @@ if not os.path.isdir(stored_path):
 class Generator(nn.Module):
     def __init__(self):
         super().__init__()
+        def gen_block(in_features,out_features):
+            layers=[nn.Linear(in_features,out_features)]
+            layers.append(nn.ReLU())
+            return layers
         self.generator=nn.Sequential(
-            nn.Linear(100,256),
-            nn.ReLU(),
-            nn.Linear(256,512),
-            nn.ReLU(),
-            nn.Linear(512,1024),
-            nn.Tanh(),
+            *block(100,128),
+            *block(128,256),
+            *block(256,512),
+            *block(512,1024),
             nn.Linear(1024,784),
+            nn.Tanh()
         )
     def forward(self,x):
         x=self.generator(x)
-        x=torch.flatten(x,1)
+        x=torch.view(x.size(0),-1)
         return x
 class Discriminator(nn.Module):
     def __init__(self):
         super().__init__()
+        def disc_block(in_features,out_features):
+            layers=[nn.Linear(in_features,out_features)]
+            layers.append(nn.ReLU())
+            layers.append(nn.Dropout())
+            return layers
         self.discriminator=nn.Sequential(
-            nn.Linear(784,1024),
-            nn.ReLU(),
-            nn.Dropout(),
-            nn.Linear(1024,512),
-            nn.ReLU(),
-            nn.Dropout(),
-            nn.Linear(512,256),
-            nn.ReLU(),
-            nn.Dropout(),
+            *disc_block(784,1024),
+            *disc_block(1024,512),
+            *disc_block(512,256),
             nn.Linear(256,1),
             nn.Sigmoid()   
         )
     def forward(self,x):
-        x=torch.flatten(x,1)
+        x=torch.view(x.size(0),-1)
         x=self.discriminator(x)
         return x
 
-Gen=Generator()
-Discrim=Discriminator()
-Gen.to(device)
-Discrim.to(device)
+Gen=Generator().to(device)
+Discrim=Discriminator().to(device)
 
 # Loss & Optim
 criterion=nn.BCELoss()
