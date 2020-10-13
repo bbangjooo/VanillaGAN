@@ -55,7 +55,7 @@ class Generator(nn.Module):
         )
     def forward(self,x):
         x=self.generator(x)
-        x=torch.view(x.size(0),-1)
+        x=x.view(x.size(0),-1)
         return x
 class Discriminator(nn.Module):
     def __init__(self):
@@ -73,7 +73,7 @@ class Discriminator(nn.Module):
             nn.Sigmoid()   
         )
     def forward(self,x):
-        x=torch.view(x.size(0),-1)
+        x=x.view(x.size(0),-1)
         x=self.discriminator(x)
         return x
 
