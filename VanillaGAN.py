@@ -100,7 +100,7 @@ def train(epoch):
             gen_img=Gen(z)
             G_optimizer.zero_grad()
             G_loss=criterion(Discrim(gen_img),real_correct)
-            G_loss.backward(retain_graph=True)
+            G_loss.backward()
             G_optimizer.step()
             # Discrim 학습
             # 진짜 이미지를 진짜로 판별할 수 있게 학습
@@ -108,12 +108,11 @@ def train(epoch):
             D_real_loss=criterion(real_output,real_correct)
 
             # 가짜 이미지를 가짜로 판별할 수 있게 학습
-            gen_img.detach().to(device) # Gen은 이미 학습해서 다시 학습 안 시키게 detach()
-            fake_output=Discrim(gen_img)
+            fake_output=Discrim(gen_img.detach().to(device)) # Gen은 이미 학습해서 다시 학습 안 시키게 detach()
             D_optimizer.zero_grad()
             D_fake_loss=criterion(fake_output,fake_correct)
             D_loss=(D_real_loss+D_fake_loss)/2
-            D_loss.backward(allow_unreachable=False)
+            D_loss.backward()
             D_optimizer.step()
 
             batch_finish=epoch * len(train_loader) + batch_idx
